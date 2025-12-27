@@ -2,15 +2,11 @@ package model;
 
 import java.io.Serializable;
 
-/**
- * Classe représentant un utilisateur du système
- * Contient les informations de connexion (nom d'utilisateur et hash du mot de passe)
- */
 public class Utilisateur implements Serializable {
     private static final long serialVersionUID = 1L;
     
     private String username;
-    private String passwordHash; // Hash du mot de passe (SHA-256)
+    private String passwordHash;
     
     public Utilisateur(String username, String passwordHash) {
         this.username = username;
@@ -46,9 +42,3 @@ public class Utilisateur implements Serializable {
         return username != null ? username.hashCode() : 0;
     }
 }
-
-
-
-
-
-

@@ -2,18 +2,14 @@ package model;
 
 import java.io.Serializable;
 
-/**
- * Classe représentant un fichier sécurisé stocké de manière chiffrée
- * Contient les métadonnées du fichier (nom, date, utilisateur propriétaire)
- */
 public class SecureFile implements Serializable {
     private static final long serialVersionUID = 1L;
     
     private String fileName;
-    private String encryptedFileName; // Nom du fichier chiffré sur le disque
-    private String ownerUsername; // Propriétaire du fichier
+    private String encryptedFileName;
+    private String ownerUsername;
     private long fileSize;
-    private long timestamp; // Date de stockage
+    private long timestamp;
     
     public SecureFile(String fileName, String encryptedFileName, String ownerUsername, long fileSize) {
         this.fileName = fileName;
@@ -68,9 +64,3 @@ public class SecureFile implements Serializable {
         return fileName + " (" + (fileSize / 1024) + " KB)";
     }
 }
-
-
-
-
-
-
