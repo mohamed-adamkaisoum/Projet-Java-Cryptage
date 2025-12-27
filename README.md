@@ -10,6 +10,53 @@ Ce projet est une application de bureau développée en Java qui offre :
 - **Stockage sécurisé** : Stockage des fichiers chiffrés dans une base de données PostgreSQL
 - **Interface graphique** : Interface utilisateur intuitive développée avec JavaFX
 
+## ⚡ Démarrage rapide
+
+### Avec Docker (Recommandé - 2 commandes seulement)
+
+```bash
+# 1. Aller dans le dossier du projet
+cd Projet-Java-Cryptage
+
+# 2. Lancer l'application (cela démarre tout automatiquement)
+docker-compose up
+```
+
+**C'est tout !** L'application devrait s'ouvrir automatiquement. La base de données PostgreSQL est créée et configurée automatiquement dans Docker.
+
+Pour arrêter l'application :
+```bash
+docker-compose down
+```
+
+---
+
+### Sans Docker (Installation manuelle)
+
+```bash
+# 1. Aller dans le dossier du projet
+cd Projet-Java-Cryptage
+
+# 2. S'assurer que PostgreSQL est installé et démarré sur votre machine
+#    (Créer la base de données 'crypto' et exécuter le script SQL dans docker/init/01-init-schema.sql)
+
+# 3. Configurer les variables d'environnement (si PostgreSQL n'est pas sur le port 5432)
+# Windows PowerShell:
+$env:DB_URL="jdbc:postgresql://localhost:5432/crypto"
+$env:DB_USER="postgres"
+$env:DB_PASSWORD="votre_mot_de_passe"
+
+# Linux/Mac:
+export DB_URL="jdbc:postgresql://localhost:5432/crypto"
+export DB_USER="postgres"
+export DB_PASSWORD="votre_mot_de_passe"
+
+# 4. Lancer l'application
+mvn javafx:run
+```
+
+---
+
 ## 🛠️ Prérequis
 
 ### Option 1 : Avec Docker (Recommandé - Plus simple)
@@ -31,25 +78,48 @@ Cette méthode est la plus simple car elle configure automatiquement tous les se
 
 **⚠️ Important :** Avec cette méthode, PostgreSQL est exécuté dans un conteneur Docker, **pas besoin d'installer PostgreSQL localement** sur votre machine.
 
-#### Étape 1 : Cloner ou télécharger le projet
+#### Étape 1 : Télécharger le projet
 
+**Option A : Avec Git**
 ```bash
-# Si vous utilisez Git
 git clone <url-du-projet>
 cd Projet-Java-Cryptage
-
-# Ou simplement téléchargez et extrayez le projet dans un dossier
 ```
 
-#### Étape 2 : Lancer avec Docker Compose
+**Option B : Téléchargement direct**
+- Téléchargez le projet (ZIP)
+- Extrayez-le dans un dossier
+- Ouvrez un terminal dans ce dossier
+
+#### Étape 2 : Vérifier que Docker est installé
 
 ```bash
-# Démarrer tous les services (base de données + application)
+# Vérifier la version de Docker
+docker --version
+
+# Vérifier que Docker Compose est disponible
+docker-compose --version
+```
+
+Si Docker n'est pas installé, téléchargez-le depuis [docker.com/get-started](https://www.docker.com/get-started)
+
+#### Étape 3 : Lancer l'application avec Docker
+
+```bash
+# Commande principale : démarre tous les services
 docker-compose up
 
-# Ou en arrière-plan
+# OU en arrière-plan (pour garder le terminal libre)
 docker-compose up -d
 ```
+
+**Ce que fait cette commande :**
+- Télécharge les images Docker nécessaires (première fois seulement)
+- Crée et démarre le conteneur PostgreSQL
+- Crée et démarre le conteneur de l'application Java
+- Crée et démarre le conteneur pgAdmin
+- Initialise automatiquement la base de données et les tables
+- Lance l'application JavaFX
 
 Cette commande va automatiquement :
 - **Créer et démarrer un conteneur PostgreSQL** (image `postgres:16-alpine`)
@@ -116,37 +186,68 @@ Si vous voulez accéder à la base de données PostgreSQL qui tourne dans Docker
 
 **⚠️ Important :** Cette méthode nécessite d'installer PostgreSQL **localement sur votre machine**. Si vous utilisez Docker (Méthode 1), vous n'avez **pas besoin** de cette méthode.
 
-#### Étape 1 : Installer PostgreSQL localement
+#### Étape 1 : Installer les prérequis
 
-1. Téléchargez et installez PostgreSQL depuis [postgresql.org](https://www.postgresql.org/download/)
-2. Notez le mot de passe que vous définissez pour l'utilisateur `postgres`
-3. Assurez-vous que le service PostgreSQL est en cours d'exécution sur votre machine
-4. Par défaut, PostgreSQL s'installe sur le port **5432** (pas 5433)
+**Installer Java 17 :**
+```bash
+# Vérifier si Java est installé
+java -version
 
-**Note :** Si vous avez déjà PostgreSQL installé localement, vous pouvez l'utiliser. Sinon, installez-le maintenant.
+# Doit afficher version 17 ou supérieure
+# Si non installé, téléchargez depuis oracle.com/java
+```
+
+**Installer Maven :**
+```bash
+# Vérifier si Maven est installé
+mvn --version
+
+# Si non installé, téléchargez depuis maven.apache.org/download.cgi
+```
+
+**Installer PostgreSQL :**
+- Téléchargez depuis [postgresql.org/download](https://www.postgresql.org/download/)
+- Installez PostgreSQL (notez le mot de passe de l'utilisateur `postgres`)
+- Assurez-vous que le service PostgreSQL est démarré
 
 #### Étape 2 : Créer la base de données
 
-1. Ouvrez **pgAdmin** (installé avec PostgreSQL) ou utilisez la ligne de commande `psql`
-2. Connectez-vous avec l'utilisateur `postgres` et votre mot de passe
-3. Créez la base de données :
+**Via ligne de commande (psql) :**
+```bash
+# Se connecter à PostgreSQL
+psql -U postgres
 
-```sql
+# Dans psql, créer la base de données
 CREATE DATABASE crypto;
+
+# Quitter psql
+\q
 ```
+
+**Via pgAdmin (interface graphique) :**
+1. Ouvrez pgAdmin
+2. Connectez-vous au serveur PostgreSQL
+3. Clic droit sur "Databases" → "Create" → "Database"
+4. Nom : `crypto`
+5. Cliquez sur "Save"
 
 #### Étape 3 : Initialiser le schéma de la base de données
 
-1. Exécutez le script SQL situé dans `docker/init/01-init-schema.sql`
-2. Vous pouvez le faire via pgAdmin ou en ligne de commande :
-
+**Via ligne de commande :**
 ```bash
-# Si PostgreSQL est sur le port 5432 (port par défaut)
+# Depuis le dossier du projet
 psql -U postgres -d crypto -f docker/init/01-init-schema.sql
 
-# Si PostgreSQL est sur un autre port
-psql -U postgres -p <votre_port> -d crypto -f docker/init/01-init-schema.sql
+# Si PostgreSQL est sur un autre port (ex: 5433)
+psql -U postgres -p 5433 -d crypto -f docker/init/01-init-schema.sql
 ```
+
+**Via pgAdmin :**
+1. Ouvrez pgAdmin
+2. Connectez-vous et sélectionnez la base de données `crypto`
+3. Ouvrez l'outil "Query Tool"
+4. Ouvrez le fichier `docker/init/01-init-schema.sql`
+5. Exécutez le script (F5 ou bouton "Execute")
 
 #### Étape 4 : Configurer la connexion
 
@@ -194,23 +295,54 @@ private static final String USER = "postgres";
 private static final String PASSWORD = "votre_mot_de_passe";  // Votre mot de passe PostgreSQL
 ```
 
+#### Étape 4 : Configurer la connexion à la base de données
+
+**Option A : Variables d'environnement (recommandé)**
+
+**Windows (PowerShell) :**
+```powershell
+# Si PostgreSQL est sur le port 5432 (port par défaut)
+$env:DB_URL="jdbc:postgresql://localhost:5432/crypto"
+$env:DB_USER="postgres"
+$env:DB_PASSWORD="votre_mot_de_passe_postgres"
+```
+
+**Windows (Invite de commande CMD) :**
+```cmd
+set DB_URL=jdbc:postgresql://localhost:5432/crypto
+set DB_USER=postgres
+set DB_PASSWORD=votre_mot_de_passe_postgres
+```
+
+**Linux/Mac :**
+```bash
+export DB_URL="jdbc:postgresql://localhost:5432/crypto"
+export DB_USER="postgres"
+export DB_PASSWORD="votre_mot_de_passe_postgres"
+```
+
+**Option B : Modifier le fichier source**
+
+Modifiez `src/main/java/util/Db.java` (lignes 9-11) avec vos paramètres.
+
 #### Étape 5 : Compiler le projet
 
 ```bash
-# Dans le répertoire du projet
+# Télécharger les dépendances et compiler
 mvn clean compile
+
+# OU compiler et créer le package
+mvn clean package
 ```
 
 #### Étape 6 : Lancer l'application
 
 ```bash
-# Lancer avec Maven
+# Méthode simple : lancer directement avec Maven
 mvn javafx:run
-
-# Ou compiler et exécuter manuellement
-mvn clean package
-java --module-path <chemin-vers-javafx> --add-modules javafx.controls -cp target/classes:target/dependency/* app.MainApp
 ```
+
+L'application JavaFX devrait s'ouvrir automatiquement.
 
 ---
 
@@ -485,6 +617,58 @@ R : Oui, l'application Java est multiplateforme. Elle fonctionne sur Windows, Ma
 
 **Q : Puis-je chiffrer des fichiers de plusieurs Go ?**  
 R : Techniquement oui, mais cela peut être lent car RSA doit diviser les fichiers en petits blocs. Pour de très gros fichiers, un algorithme hybride (RSA + AES) serait plus approprié.
+
+---
+
+## 📝 Récapitulatif des commandes principales
+
+### Avec Docker (Méthode recommandée)
+
+```bash
+# 1. Aller dans le dossier du projet
+cd Projet-Java-Cryptage
+
+# 2. Lancer l'application (tout est automatique)
+docker-compose up
+
+# 3. Arrêter l'application
+docker-compose down
+
+# 4. Voir les logs
+docker-compose logs app
+
+# 5. Redémarrer les services
+docker-compose restart
+```
+
+### Sans Docker (Installation manuelle)
+
+```bash
+# 1. Aller dans le dossier du projet
+cd Projet-Java-Cryptage
+
+# 2. Créer la base de données (une seule fois)
+psql -U postgres
+CREATE DATABASE crypto;
+\q
+
+# 3. Initialiser les tables (une seule fois)
+psql -U postgres -d crypto -f docker/init/01-init-schema.sql
+
+# 4. Configurer les variables d'environnement (à chaque nouvelle session)
+# Windows PowerShell:
+$env:DB_URL="jdbc:postgresql://localhost:5432/crypto"
+$env:DB_USER="postgres"
+$env:DB_PASSWORD="votre_mot_de_passe"
+
+# Linux/Mac:
+export DB_URL="jdbc:postgresql://localhost:5432/crypto"
+export DB_USER="postgres"
+export DB_PASSWORD="votre_mot_de_passe"
+
+# 5. Lancer l'application
+mvn javafx:run
+```
 
 ---
 
